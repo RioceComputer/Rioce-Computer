@@ -131,7 +131,7 @@ input:focus{ outline:none; border-color:var(--accent); }
         <button id="forgot-submit" class="btn">Send reset link</button>
       </div>
       <div id="g_id_onload"
-       data-client_id="938821666557-e6ibg5t10ph3km5st846depfcus9e16m.apps.googleusercontent.com"
+       data-client_id="365187084872-ue28gbnv1fam5n9g0g5ausg9ct12c5fo.apps.googleusercontent.com"
        data-callback="handleCredentialResponse"></div>
   <div class="g_id_signin" data-type="standard"></div>
 
@@ -271,12 +271,12 @@ app.post('/verify-token', async (req,res)=>{
 app.listen(3000, ()=>console.log('http://localhost:3000'));
 // verify.js (backend example)
 const {OAuth2Client} = require('google-auth-library');
-const client = new OAuth2Client("938821666557-e6ibg5t10ph3km5st846depfcus9e16m.apps.googleusercontent.com");
+const client = new OAuth2Client("365187084872-ue28gbnv1fam5n9g0g5ausg9ct12c5fo.apps.googleusercontent.com");
 
 async function verify(token) {
   const ticket = await client.verifyIdToken({
     idToken: token,
-    audience: "938821666557-e6ibg5t10ph3km5st846depfcus9e16m.apps.googleusercontent.com",
+    audience: "365187084872-ue28gbnv1fam5n9g0g5ausg9ct12c5fo.apps.googleusercontent.com",
   });
   return ticket.getPayload(); // user info
 }
@@ -285,4 +285,5 @@ async function verify(token) {
 </body>
 
 </html>
+
 
