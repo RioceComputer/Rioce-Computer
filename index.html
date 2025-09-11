@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <title>Rioce Computer studies • Secure</title>
+  <style>
+     :root{
+  --bg: #ffffff;
+  --card: #f9f9f9;
+  --glass-border: #e5e5e5;
+  --accent: #000000;
+  --muted: #666666;
+  --error: #d32f2f;
+}
+
+*{ box-sizing: border-box; font-family: Arial, sans-serif; }
+html,body{ height:100%; margin:0; background:var(--bg); color:#111; }
+.wrap{ min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:28px; }
+.card{
+  width:min(480px, 96%);
+  border-radius:12px;
+  padding:24px;
+  background:var(--card);
+  border:1px solid var(--glass-border);
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+h2{ text-align:center; margin-bottom:12px; }
+
+.tabs{ display:flex; gap:6px; margin:16px 0; }
+.tab{
+  flex:1; padding:10px; border:1px solid var(--glass-border);
+  border-radius:8px; cursor:pointer; background:#fff; color:#333;
+}
+.tab.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+
+.panel{ display:none; }
+.panel.active{ display:block; }
+
+.field{ margin:10px 0; display:flex; flex-direction:column; }
+input{
+  padding:10px; border-radius:6px; border:1px solid #ccc;
+  font-size:1rem;
+}
+input:focus{ outline:none; border-color:var(--accent); }
+
+.btn{
+  padding:12px; border:none; border-radius:8px;
+  background:var(--accent); color:white; cursor:pointer; width:100%;
+  font-weight:bold; margin-top:10px;
+}
+.btn:hover{ opacity:0.9; }
+
+.error{ color:var(--error); font-size:.85rem; margin-top:2px; }
+.muted{ color:var(--muted); font-size:.85rem; }
+
+.toast{
+  position:fixed; top:20px; right:20px;
+  padding:12px 18px;
+  background:#111; color:white;
+  border-radius:6px;
+  font-size:.9rem;
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);
+}
+
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <h2>Secure Auth</h2>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button id="tab-login" class="tab active">Login</button>
+        <button id="tab-signup" class="tab">Sign Up</button>
+        <button id="tab-forgot" class="tab">Forgot</button>
+        
+      
+      </div>
+
+      <!-- Panels -->
+      <div id="panel-login" class="panel active">
+        <label class="field">
+          <span>Email</span>
+          <input id="login-email" type="email" required />
+          <small id="login-email-err" class="error"></small>
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input id="login-pass" type="password" required />
+          <small id="login-pass-err" class="error"></small>
+        </label>
+        <label><input id="login-remember" type="checkbox" /> Remember me</label>
+        <button id="login-submit" class="btn">Sign in</button>
+      </div>
+
+      <div id="panel-signup" class="panel">
+        <label class="field">
+          <span>Full name</span>
+          <input id="signup-name" type="text" required />
+          <small id="signup-name-err" class="error"></small>
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input id="signup-email" type="email" required />
+          <small id="signup-email-err" class="error"></small>
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input id="signup-pass" type="password" required />
+          <small id="signup-pass-err" class="error"></small>
+        </label>
+        <label class="field">
+          <span>Confirm Password</span>
+          <input id="signup-confirm" type="password" required />
+          <small id="signup-confirm-err" class="error"></small>
+        </label>
+        <label><input id="signup-terms" type="checkbox" /> Accept Terms</label>
+        <small id="signup-terms-err" class="error"></small>
+        <button id="signup-submit" class="btn">Create Account</button>
+      </div>
+
+      <div id="panel-forgot" class="panel">
+        <label class="field">
+          <span>Email</span>
+          <input id="forgot-email" type="email" required />
+          <small id="forgot-email-err" class="error"></small>
+        </label>
+        <button id="forgot-submit" class="btn">Send reset link</button>
+      </div>
+      <div id="g_id_onload"
+       data-client_id="938821666557-e6ibg5t10ph3km5st846depfcus9e16m.apps.googleusercontent.com"
+       data-callback="handleCredentialResponse"></div>
+  <div class="g_id_signin" data-type="standard"></div>
+
+  <pre id="info"></pre>
+
+    </section>
+  </main>
+  
+
+  <div id="toast"></div>
+<script>
+  function handleCredentialResponse(res) {
+  window.location.href = "dashboard-User.html";
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tabs = {
+    login: document.getElementById('tab-login'),
+    signup: document.getElementById('tab-signup'),
+    forgot: document.getElementById('tab-forgot')
+  };
+  const panels = {
+    login: document.getElementById('panel-login'),
+    signup: document.getElementById('panel-signup'),
+    forgot: document.getElementById('panel-forgot')
+  };
+  function switchTo(name){
+    Object.values(tabs).forEach(b=>b.classList.remove('active'));
+    Object.values(panels).forEach(p=>p.classList.remove('active'));
+    tabs[name].classList.add('active');
+    panels[name].classList.add('active');
+  }
+  tabs.login.onclick=()=>switchTo('login');
+  tabs.signup.onclick=()=>switchTo('signup');
+  tabs.forgot.onclick=()=>switchTo('forgot');
+
+  // Toast helper
+  function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast'; setTimeout(()=>t.textContent='',3000); }
+
+  // Storage helpers
+  function saveUser(user){
+    let users = JSON.parse(localStorage.getItem("users")||"[]");
+    users.push(user);
+    localStorage.setItem("users", JSON.stringify(users));
+  }
+  function findUser(email){
+    let users = JSON.parse(localStorage.getItem("users")||"[]");
+    return users.find(u=>u.email===email);
+  }
+
+  // User Signup
+  document.getElementById('signup-submit').onclick=()=>{
+    let name=document.getElementById('signup-name').value.trim();
+    let email=document.getElementById('signup-email').value.trim();
+    let pass=document.getElementById('signup-pass').value;
+    let confirm=document.getElementById('signup-confirm').value;
+    let terms=document.getElementById('signup-terms').checked;
+    if(name.length<2) return toast("Enter full name");
+    if(findUser(email)) return toast("Email already registered");
+    if(pass!==confirm) return toast("Passwords do not match");
+    if(!terms) return toast("Accept terms first");
+    saveUser({name,email,pass});
+    toast("Account created! Please login.");
+    switchTo('login');
+  };
+
+  // User Login 
+  document.getElementById('login-submit').onclick=()=>{
+    let email=document.getElementById('login-email').value.trim();
+    let pass=document.getElementById('login-pass').value;
+    let remember=document.getElementById('login-remember').checked;
+    let user=findUser(email);
+    if(!user) return toast("User not found");
+    if(user.pass!==pass) return toast("Wrong password");
+    toast("Login successful!");
+    if(remember) localStorage.setItem("currentUser", JSON.stringify(user));
+    setTimeout(()=>window.location="dashboard-User.html",1000);
+  };
+
+  //User Forgot
+  document.getElementById('forgot-submit').onclick=()=>{
+    let email=document.getElementById('forgot-email').value.trim();
+    let user=findUser(email);
+    if(!user) return toast("Email not registered");
+    toast("Reset link sent (mock)");
+  };
+
+  // Auto-login
+  let saved=localStorage.getItem("currentUser");
+  if(saved){
+    let u=JSON.parse(saved);
+    toast("Welcome back, "+u.name);
+    setTimeout(()=>window.location="dashboard-User.html",1000);
+  }
+});
+// webpage inspect control
+document.addEventListener("contextmenu", function(event) {
+    event.preventDefault();
+  });
+/* this code is a block a keyboard shortcuts*/
+  document.addEventListener("keydown", function(event) {
+    if (event.ctrlKey && (event.key === "u" || event.key === "U")) {
+      event.preventDefault();
+    }
+  });
+  /* This code is a block a Inspect Elements & Developer Tools*/
+  document.addEventListener("keydown", function(event) {
+    if (event.ctrlKey && event.shiftKey && event.key === "I") {
+      event.preventDefault();
+    }
+    if (event.ctrlKey && event.shiftKey && event.key === "J") {
+      event.preventDefault();
+    }
+    if (event.ctrlKey && event.key === "S") {
+      event.preventDefault();
+    }
+    if (event.ctrlKey && event.key === "H") {
+      event.preventDefault();
+    }
+    if (event.key === "F12") {
+      event.preventDefault();
+    }
+  });
+const express = require('express');
+const fetch = (...a) => import('node-fetch').then(({default:f}) => f(...a));
+const app = express();
+app.use(express.json());
+app.use(express.static(__dirname));
+
+app.post('/verify-token', async (req,res)=>{
+  const token = req.body.id_token;
+  const r = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
+  const data = await r.json();
+  res.json(data);
+});
+
+app.listen(3000, ()=>console.log('http://localhost:3000'));
+// verify.js (backend example)
+const {OAuth2Client} = require('google-auth-library');
+const client = new OAuth2Client("938821666557-e6ibg5t10ph3km5st846depfcus9e16m.apps.googleusercontent.com");
+
+async function verify(token) {
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: "938821666557-e6ibg5t10ph3km5st846depfcus9e16m.apps.googleusercontent.com",
+  });
+  return ticket.getPayload(); // user info
+}
+
+</script>
+</body>
+
+</html>
+
