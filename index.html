@@ -9,19 +9,19 @@
   <title>Rioce Computer studies • Secure</title>
 </head>
 <body>
-  	<img src="Rioce-image.png" alt="Rioce Logo" class="logo"/>
+  	<img src="Rioce-image.png" alt="Rioce-image" class="logo"/>
     <main class="wrap">
     <section class="card">
       <h2>Rioce Computer</h2>
       <h1>Secure Auth</h1>
-      <!-- Tabs -->
+      
       <div class="tabs">
         <button id="tab-login" class="tab active">Login</button>
         <button id="tab-signup" class="tab">Sign Up</button>
         <button id="tab-forgot" class="tab">Forgot</button>
       </div>
 
-      <!-- Panels -->
+      
       <div id="panel-login" class="panel active">
         <label class="field">
           <span>Email</span>
@@ -72,7 +72,7 @@
         <button id="forgot-submit" class="btn">Send reset link</button>
       </div>
 
-      <!-- Google -->
+      
       <div id="g_id_onload"
        data-client_id="365187084872-ue28gbnv1fam5n9g0g5ausg9ct12c5fo.apps.googleusercontent.com"
        data-callback="handleCredentialResponse"></div>
@@ -82,7 +82,7 @@
   </main>
   <div id="toast"></div>
 <script>
-  // --- Toast Helper (only one function) ---
+ 
   function toast(msg){ 
     const t=document.getElementById('toast'); 
     t.textContent=msg; 
@@ -90,7 +90,7 @@
     setTimeout(()=>t.textContent='',3000); 
   }
 
-  // --- Google Login Handler ---
+ 
   function handleCredentialResponse(res) {
     fetch('/verify-token', {
       method: 'POST',
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
   tabs.signup.onclick=()=>switchTo('signup');
   tabs.forgot.onclick=()=>switchTo('forgot');
 
-  // Storage helpers
+ 
   function saveUser(user){
     let users = JSON.parse(localStorage.getItem("users")||"[]");
     users.push(user);
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return users.find(u=>u.email===email);
   }
 
-  // --- User Signup ---
+  
   document.getElementById('signup-submit').onclick=()=>{
     let name=document.getElementById('signup-name').value.trim();
     let email=document.getElementById('signup-email').value.trim();
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     switchTo('login');
   };
 
-  // --- User Login ---
+ 
   document.getElementById('login-submit').onclick=()=>{
     let email=document.getElementById('login-email').value.trim();
     let pass=document.getElementById('login-pass').value;
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(()=>window.location="dashboard-User.html",1000);
   };
 
-  // --- Forgot ---
+  
   document.getElementById('forgot-submit').onclick=()=>{
     let email=document.getElementById('forgot-email').value.trim();
     let user=findUser(email);
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toast("Reset link sent (mock)");
   };
 
-  // --- Auto-login ---
+ 
   let saved=localStorage.getItem("currentUser");
   if(saved){
     let u=JSON.parse(saved);
