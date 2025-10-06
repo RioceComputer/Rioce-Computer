@@ -4,21 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="script.js"></script>
   <link rel="stylesheet" href="login-style.css">
   <title>Rioce Computer studies • Secure</title>
 </head>
 <body>
-  <main class="wrap">
+  	<img src="Rioce-image.png" alt="Rioce Logo" class="logo"/>
+    <main class="wrap">
     <section class="card">
-      <h2>Secure Auth</h2>
-
+      <h2>Rioce Computer</h2>
+      <h1>Secure Auth</h1>
       <!-- Tabs -->
       <div class="tabs">
         <button id="tab-login" class="tab active">Login</button>
         <button id="tab-signup" class="tab">Sign Up</button>
         <button id="tab-forgot" class="tab">Forgot</button>
-        
-      
       </div>
 
       <!-- Panels -->
@@ -71,22 +71,50 @@
         </label>
         <button id="forgot-submit" class="btn">Send reset link</button>
       </div>
+
+      <!-- Google -->
       <div id="g_id_onload"
        data-client_id="365187084872-ue28gbnv1fam5n9g0g5ausg9ct12c5fo.apps.googleusercontent.com"
        data-callback="handleCredentialResponse"></div>
-  <div class="g_id_signin" data-type="standard"></div>
-
-  <pre id="info"></pre>
+      <div class="g_id_signin" data-type="standard"></div>
 
     </section>
   </main>
-  
-
   <div id="toast"></div>
 <script>
+  // --- Toast Helper (only one function) ---
+  function toast(msg){ 
+    const t=document.getElementById('toast'); 
+    t.textContent=msg; 
+    t.className='toast'; 
+    setTimeout(()=>t.textContent='',3000); 
+  }
+
+  // --- Google Login Handler ---
   function handleCredentialResponse(res) {
-  window.location.href = "dashboard-User.html";
-}
+    fetch('/verify-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_token: res.credential })
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d && d.email) {
+        let users = JSON.parse(localStorage.getItem("users")||"[]");
+        let existing = users.find(u=>u.email===d.email);
+        if (!existing) {
+          let user = { name: d.name || "Google User", email: d.email, pass: "google_oauth" };
+          users.push(user);
+          localStorage.setItem("users", JSON.stringify(users));
+        }
+        localStorage.setItem("currentUser", JSON.stringify(d));
+        toast("Google login success! Redirecting...");
+        setTimeout(()=>window.location="dashboard-User.html",1000);
+      } else {
+        toast("Google login failed!");
+      }
+    });
+  }
 
 document.addEventListener('DOMContentLoaded', () => {
   const tabs = {
@@ -99,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     signup: document.getElementById('panel-signup'),
     forgot: document.getElementById('panel-forgot')
   };
+
   function switchTo(name){
     Object.values(tabs).forEach(b=>b.classList.remove('active'));
     Object.values(panels).forEach(p=>p.classList.remove('active'));
@@ -108,9 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
   tabs.login.onclick=()=>switchTo('login');
   tabs.signup.onclick=()=>switchTo('signup');
   tabs.forgot.onclick=()=>switchTo('forgot');
-
-  // Toast helper
-  function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast'; setTimeout(()=>t.textContent='',3000); }
 
   // Storage helpers
   function saveUser(user){
@@ -123,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return users.find(u=>u.email===email);
   }
 
-  // User Signup
+  // --- User Signup ---
   document.getElementById('signup-submit').onclick=()=>{
     let name=document.getElementById('signup-name').value.trim();
     let email=document.getElementById('signup-email').value.trim();
@@ -131,15 +157,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let confirm=document.getElementById('signup-confirm').value;
     let terms=document.getElementById('signup-terms').checked;
     if(name.length<2) return toast("Enter full name");
-    if(findUser(email)) return toast("Email already registered");
     if(pass!==confirm) return toast("Passwords do not match");
     if(!terms) return toast("Accept terms first");
-    saveUser({name,email,pass});
-    toast("Account created! Please login.");
+
+    let finalEmail=email;
+    while(findUser(finalEmail)) {
+      let rand=Math.floor(Math.random()*1000);
+      finalEmail=email.replace("@","+"+rand+"@");
+    }
+
+    saveUser({name,email:finalEmail,pass});
+    toast("Account created with email: "+finalEmail);
     switchTo('login');
   };
 
-  // User Login 
+  // --- User Login ---
   document.getElementById('login-submit').onclick=()=>{
     let email=document.getElementById('login-email').value.trim();
     let pass=document.getElementById('login-pass').value;
@@ -152,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(()=>window.location="dashboard-User.html",1000);
   };
 
-  //User Forgot
+  // --- Forgot ---
   document.getElementById('forgot-submit').onclick=()=>{
     let email=document.getElementById('forgot-email').value.trim();
     let user=findUser(email);
@@ -160,72 +192,14 @@ document.addEventListener('DOMContentLoaded', () => {
     toast("Reset link sent (mock)");
   };
 
-  // Auto-login
+  // --- Auto-login ---
   let saved=localStorage.getItem("currentUser");
   if(saved){
     let u=JSON.parse(saved);
-    toast("Welcome back, "+u.name);
+    toast("Welcome back, "+(u.name||"User"));
     setTimeout(()=>window.location="dashboard-User.html",1000);
   }
 });
-// webpage inspect control
-document.addEventListener("contextmenu", function(event) {
-    event.preventDefault();
-  });
-/* this code is a block a keyboard shortcuts*/
-  document.addEventListener("keydown", function(event) {
-    if (event.ctrlKey && (event.key === "u" || event.key === "U")) {
-      event.preventDefault();
-    }
-  });
-  /* This code is a block a Inspect Elements & Developer Tools*/
-  document.addEventListener("keydown", function(event) {
-    if (event.ctrlKey && event.shiftKey && event.key === "I") {
-      event.preventDefault();
-    }
-    if (event.ctrlKey && event.shiftKey && event.key === "J") {
-      event.preventDefault();
-    }
-    if (event.ctrlKey && event.key === "S") {
-      event.preventDefault();
-    }
-    if (event.ctrlKey && event.key === "H") {
-      event.preventDefault();
-    }
-    if (event.key === "F12") {
-      event.preventDefault();
-    }
-  });
-const express = require('express');
-const fetch = (...a) => import('node-fetch').then(({default:f}) => f(...a));
-const app = express();
-app.use(express.json());
-app.use(express.static(__dirname));
-
-app.post('/verify-token', async (req,res)=>{
-  const token = req.body.id_token;
-  const r = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
-  const data = await r.json();
-  res.json(data);
-});
-
-app.listen(3000, ()=>console.log('http://localhost:3000'));
-// verify.js (backend example)
-const {OAuth2Client} = require('google-auth-library');
-const client = new OAuth2Client("365187084872-ue28gbnv1fam5n9g0g5ausg9ct12c5fo.apps.googleusercontent.com");
-
-async function verify(token) {
-  const ticket = await client.verifyIdToken({
-    idToken: token,
-    audience: "365187084872-ue28gbnv1fam5n9g0g5ausg9ct12c5fo.apps.googleusercontent.com",
-  });
-  return ticket.getPayload(); // user info
-}
-
 </script>
 </body>
-
 </html>
-
-
-
