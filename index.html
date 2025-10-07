@@ -81,40 +81,45 @@
     </section>
   </main>
   <div id="toast"></div>
-<script>
- 
-  function toast(msg){ 
-    const t=document.getElementById('toast'); 
-    t.textContent=msg; 
-    t.className='toast'; 
-    setTimeout(()=>t.textContent='',3000); 
-  }
+  <script>
+function toast(msg) { 
+  const t = document.getElementById('toast'); 
+  t.textContent = msg; 
+  t.className = 'toast'; 
+  setTimeout(() => { 
+    t.textContent = ''; 
+    t.className = ''; 
+  }, 3000); 
+}
 
- 
-  function handleCredentialResponse(res) {
-    fetch('/verify-token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id_token: res.credential })
-    })
-    .then(r => r.json())
-    .then(d => {
-      if (d && d.email) {
-        let users = JSON.parse(localStorage.getItem("users")||"[]");
-        let existing = users.find(u=>u.email===d.email);
-        if (!existing) {
-          let user = { name: d.name || "Google User", email: d.email, pass: "google_oauth" };
-          users.push(user);
-          localStorage.setItem("users", JSON.stringify(users));
-        }
-        localStorage.setItem("currentUser", JSON.stringify(d));
-        toast("Google login success! Redirecting...");
-        setTimeout(()=>window.location="dashboard-User.html",1000);
-      } else {
-        toast("Google login failed!");
+// --- Google Login Handler ---
+function handleCredentialResponse(res) {
+  fetch('/verify-token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id_token: res.credential })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d && d.email) {
+      let users = JSON.parse(localStorage.getItem("users") || "[]");
+      let existing = users.find(u => u.email === d.email);
+      if (!existing) {
+        let user = { name: d.name || "Google User", email: d.email, pass: "google_oauth" };
+        users.push(user);
+        localStorage.setItem("users", JSON.stringify(users));
       }
-    });
-  }
+      localStorage.setItem("currentUser", JSON.stringify(d));
+      toast("Google login success! Redirecting...");
+      setTimeout(() => {
+        window.location.href = "./dashboard-User.html"; // ✅ safe redirect for GitHub/local
+      }, 1000);
+    } else {
+      toast("Google login failed!");
+    }
+  })
+  .catch(() => toast("Google login failed!"));
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const tabs = {
@@ -128,81 +133,90 @@ document.addEventListener('DOMContentLoaded', () => {
     forgot: document.getElementById('panel-forgot')
   };
 
-  function switchTo(name){
-    Object.values(tabs).forEach(b=>b.classList.remove('active'));
-    Object.values(panels).forEach(p=>p.classList.remove('active'));
+  // Tab Switch Function
+  function switchTo(name) {
+    Object.values(tabs).forEach(b => b.classList.remove('active'));
+    Object.values(panels).forEach(p => p.classList.remove('active'));
     tabs[name].classList.add('active');
     panels[name].classList.add('active');
   }
-  tabs.login.onclick=()=>switchTo('login');
-  tabs.signup.onclick=()=>switchTo('signup');
-  tabs.forgot.onclick=()=>switchTo('forgot');
+  tabs.login.onclick = () => switchTo('login');
+  tabs.signup.onclick = () => switchTo('signup');
+  tabs.forgot.onclick = () => switchTo('forgot');
 
- 
-  function saveUser(user){
-    let users = JSON.parse(localStorage.getItem("users")||"[]");
+  // LocalStorage Helper Functions
+  function saveUser(user) {
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
     users.push(user);
     localStorage.setItem("users", JSON.stringify(users));
   }
-  function findUser(email){
-    let users = JSON.parse(localStorage.getItem("users")||"[]");
-    return users.find(u=>u.email===email);
+  function findUser(email) {
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
+    return users.find(u => u.email === email);
   }
 
-  
-  document.getElementById('signup-submit').onclick=()=>{
-    let name=document.getElementById('signup-name').value.trim();
-    let email=document.getElementById('signup-email').value.trim();
-    let pass=document.getElementById('signup-pass').value;
-    let confirm=document.getElementById('signup-confirm').value;
-    let terms=document.getElementById('signup-terms').checked;
-    if(name.length<2) return toast("Enter full name");
-    if(pass!==confirm) return toast("Passwords do not match");
-    if(!terms) return toast("Accept terms first");
+  // --- User Signup ---
+  document.getElementById('signup-submit').onclick = () => {
+    let name = document.getElementById('signup-name').value.trim();
+    let email = document.getElementById('signup-email').value.trim();
+    let pass = document.getElementById('signup-pass').value;
+    let confirm = document.getElementById('signup-confirm').value;
+    let terms = document.getElementById('signup-terms').checked;
 
-    let finalEmail=email;
-    while(findUser(finalEmail)) {
-      let rand=Math.floor(Math.random()*1000);
-      finalEmail=email.replace("@","+"+rand+"@");
-    }
+    if (name.length < 2) return toast("Enter full name");
+    if (pass !== confirm) return toast("Passwords do not match");
+    if (!terms) return toast("Accept terms first");
+    if (!email.includes('@')) return toast("Enter valid email");
 
-    saveUser({name,email:finalEmail,pass});
-    toast("Account created with email: "+finalEmail);
+    // check duplicate email
+    if (findUser(email)) return toast("Email already registered");
+
+    saveUser({ name, email, pass });
+    toast("Account created successfully!");
     switchTo('login');
   };
 
- 
-  document.getElementById('login-submit').onclick=()=>{
-    let email=document.getElementById('login-email').value.trim();
-    let pass=document.getElementById('login-pass').value;
-    let remember=document.getElementById('login-remember').checked;
-    let user=findUser(email);
-    if(!user) return toast("User not found");
-    if(user.pass!==pass) return toast("Wrong password");
+  // --- User Login ---
+  document.getElementById('login-submit').onclick = () => {
+    let email = document.getElementById('login-email').value.trim();
+    let pass = document.getElementById('login-pass').value;
+    let remember = document.getElementById('login-remember').checked;
+    let user = findUser(email);
+
+    if (!user) return toast("User not found");
+    if (user.pass !== pass) return toast("Wrong password");
+
     toast("Login successful!");
-    if(remember) localStorage.setItem("currentUser", JSON.stringify(user));
-    setTimeout(()=>window.location="dashboard-User.html",1000);
+    if (remember) localStorage.setItem("currentUser", JSON.stringify(user));
+
+    console.log("Redirecting to dashboard...");
+    setTimeout(() => {
+      window.location.href = "./dashboard-User.html"; // ✅ works everywhere
+    }, 1000);
   };
 
-  
-  document.getElementById('forgot-submit').onclick=()=>{
-    let email=document.getElementById('forgot-email').value.trim();
-    let user=findUser(email);
-    if(!user) return toast("Email not registered");
-    toast("Reset link sent (mock)");
+  // --- Forgot Password ---
+  document.getElementById('forgot-submit').onclick = () => {
+    let email = document.getElementById('forgot-email').value.trim();
+    let user = findUser(email);
+    if (!user) return toast("Email not registered");
+    toast("Reset link sent to your email (mock)");
   };
 
- 
-  let saved=localStorage.getItem("currentUser");
-  if(saved){
-    let u=JSON.parse(saved);
-    toast("Welcome back, "+(u.name||"User"));
-    setTimeout(()=>window.location="dashboard-User.html",1000);
+  // --- Auto-login if saved user ---
+  let saved = localStorage.getItem("currentUser");
+  if (saved) {
+    let u = JSON.parse(saved);
+    toast("Welcome back, " + (u.name || "User"));
+    setTimeout(() => {
+      window.location.href = "./dashboard-User.html";
+    }, 1000);
   }
 });
 </script>
 </body>
 </html>
+
 
 
 
