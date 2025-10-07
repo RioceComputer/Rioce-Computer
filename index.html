@@ -87,7 +87,7 @@
     const t=document.getElementById('toast'); 
     t.textContent=msg; 
     t.className='toast'; 
-    setTimeout(()=>t.textContent='',100); 
+    setTimeout(()=>t.textContent='',3000); 
   }
 
  
@@ -109,7 +109,7 @@
         }
         localStorage.setItem("currentUser", JSON.stringify(d));
         toast("Google login success! Redirecting...");
-        setTimeout(()=>window.location="dashboard-User.html"300);
+        setTimeout(()=>window.location="dashboard-User.html",1000);
       } else {
         toast("Google login failed!");
       }
@@ -203,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
 
 
 
