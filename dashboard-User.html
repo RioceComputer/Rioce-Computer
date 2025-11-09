@@ -438,11 +438,11 @@ document.addEventListener("contextmenu", function(event) {
       event.preventDefault();
     }
   }); 
-   emailjs.init("RO3yLspygrBQx32Oa");
+   emailjs.init("SzxlHRy5_sMUejOLM");
   document.getElementById("admissionForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
-    emailjs.sendForm("service_ef0eqmp", "template_h13x9y6", this)
+    emailjs.sendForm("service_rtu5a8u", "template_ggh66xc", this)
       .then(() => {
         alert("✅ Admission form submitted successfully! Check your email.");
         document.getElementById("admissionForm").reset();
@@ -451,3 +451,4 @@ document.addEventListener("contextmenu", function(event) {
       });
   });
 </script>
+
