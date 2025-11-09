@@ -228,7 +228,6 @@
     </div>
   </section>
 
-  <!-- Get Teach / Fee Submit -->
 <section id="admission" class="container section light">
   <div class="Get-Teach">
    <h2>Get Teach</h2>
@@ -364,12 +363,8 @@
         }
         animate();
 
-    // Basic interactivity: prefill course from Apply buttons, local submission storage, simple message
 document.addEventListener('DOMContentLoaded', function () {
-  // Update year in footer
   document.getElementById('year').textContent = new Date().getFullYear();
-
-  // Apply buttons: set course & fee and scroll to form
   document.querySelectorAll('.apply-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const course = btn.dataset.course || '';
@@ -377,12 +372,9 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('studentCourse').value = course;
       document.getElementById('studentFee').value = fee;
       location.hash = '#admission';
-      // small focus
       setTimeout(()=> document.getElementById('studentName').focus(), 300);
     });
   });
-
-  // Get Teach handling (frontend)
   const form = document.getElementById('admissionForm');
   const message = document.getElementById('formMessage');
 
@@ -398,24 +390,18 @@ document.addEventListener('DOMContentLoaded', function () {
       message.textContent = 'Please fill all required fields.';
       return;
     }
-  
-    // Save submission to localStorage (as simple storage demo)
     const submissions = JSON.parse(localStorage.getItem('rioce_submissions') || '[]');
     submissions.push({ name, email, course, fee, date: new Date().toISOString() });
     localStorage.setItem('rioce_submissions', JSON.stringify(submissions));
 
     message.style.color = 'green';
     message.textContent = 'Thank you! Your application has been received. We will contact you soon.';
-
-    // Reset form after submit (but keep course prefilled)
     setTimeout(() => {
       form.reset();
       document.getElementById('studentCourse').value = course;
       document.getElementById('studentFee').value = fee;
     }, 800);
   });
-
-  // Reset button
   document.getElementById('resetForm').addEventListener('click', () => {
     form.reset();
     message.textContent = '';
@@ -424,20 +410,17 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener("contextmenu", function(event) {
     event.preventDefault();
   }); 
- // Reset button
   document.getElementById("resetForm").addEventListener("click", function () {
     document.getElementById("admissionForm").reset();
   });
       document.addEventListener("contextmenu", function(event) {
     event.preventDefault();
   });
-/* this code is a block a keyboard shortcuts*/
   document.addEventListener("keydown", function(event) {
     if (event.ctrlKey && (event.key === "u" || event.key === "U")) {
       event.preventDefault();
     }
   });
-  /* This code is a block a Inspect Elements & Developer Tools*/
   document.addEventListener("keydown", function(event) {
     if (event.ctrlKey && event.shiftKey && event.key === "I") {
       event.preventDefault();
@@ -455,15 +438,11 @@ document.addEventListener("contextmenu", function(event) {
       event.preventDefault();
     }
   }); 
-
-//Emaill service 
-   emailjs.init("SzxlHRy5_sMUejOLM");
-
-  // Form submit
+   emailjs.init("RO3yLspygrBQx32Oa");
   document.getElementById("admissionForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
-    emailjs.sendForm("service_9lmee27", "template_gypoml7", this)
+    emailjs.sendForm("service_ef0eqmp", "template_h13x9y6", this)
       .then(() => {
         alert("✅ Admission form submitted successfully! Check your email.");
         document.getElementById("admissionForm").reset();
@@ -472,5 +451,3 @@ document.addEventListener("contextmenu", function(event) {
       });
   });
 </script>
-
-
